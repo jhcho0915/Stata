@@ -1,0 +1,56 @@
+% Problem Set 1
+% September 5, 2018
+% Jae H. Cho
+
+*The data, auto.csv, provides a list of different cars and their contributing variables including sales price, trunk size, headroom size, weight, height, gear ratio, etc. Let us read the fuel efficiency data that ships with Stata.*
+
+#### 1) Introduction
+
+**Loading Data/Regress**
+
+	sysuse auto
+	reg price mpg
+
+**Summary**
+
+	sum
+
+**Histogram**
+
+	hist price
+	graph export price.png, replace
+		
+![Histogram of Price](price.png){width=60%}
+
+[The regressions results are shown below where we observe mpg and foreign to price]{custom-style="Highlight"}
+
+*Here are the regression results, setting price as our dependent variable:*
+	
+	reg price mpg foreign
+
+*Below shows the following regression equation for cars back in the day:*
+
+$$
+	price_i = \beta_0 + \beta_1 mpg_i + \beta_2 foreign_i + \epsilon_i
+$$
+
+- price_i is the dependent variable (random)
+
+- \beta are the coefficients (true but unknown population parameters) and estiamtes of our regression analysis
+
+- \epsilon_i (random error) is a random term
+
+#### 2) and 3) Results
+
+*Looks like back in the day, foreign cars sell for more!*
+
+**Interpretation**
+
+- For every unit increase in mpg, a 294.1955 unit decrease in car price is predicted, holding all other variables constant.
+
+- If the car is foreign, a 1767.292 unit increase in price is predicted, holding all other variables constant.
+(In other words, the price of a foreign car would be greater than that of a domestic car)
+
+[Link to Issues Tracker]{custom-style="Highlight"}
+
+[Click Here]('https://gitlab.com/robhicks/econ407/issues/2')

@@ -1,0 +1,315 @@
+% Problem Set 4
+% November 14, 2018
+% Jae H. Cho
+
+**1)**
+
+b) The maximum likelihood estimate of the mean given each distribution was found 
+using the formula in an excel spreadhseet document. The maximum log-likelihood 
+function value for each distribution was also reported on a separate excel spreadsheet. 
+
+
+c) The Likelihood Ratio Test examines the changes in the joint likelihood when 
+restrictions are imposed. After having considered the Poisson Distribution, the 
+likelihood ratio test, test H0 : λ = 8 was implemented. After calculating the 
+estimated means given at λ= 8, we were given an LR value greater than 10 and a 
+low p-value, we chose to reject the NULL hypothesis and considered that θ is not 
+good enough for implementing in the maximum likelihood function. With a lower
+log likelihood value we rejected the null hypothesis.
+
+
+d) The poisson MLE model is the preferred model for the mean. This is becuase 
+after observing the data in the excel spreadsheet, the possion MLE model had a
+higher log likelihood sum value in comparison to the normal MLE model. We choose
+to use this preference because a higher value indicates a model mean closer to 
+the peak of the distribution.
+
+
+**2)**
+
+The House of Representatives contained 234 Republicans, 198 Democrats and 1 
+independent. As you probably know, each House member represents one of the 435 
+districts in the country. This data set contains demographic and employment data 
+for each district as well as a variable indicating whether the district’s
+representative in the House was a Republican or not. Where Republican districts 
+were coded as 1 while Democratic/independent districts were coded as 0. In the 
+Congressional District Data, there are 435 observations on 31 variables.
+
+a) Model Party Control
+
+When using this data to model party control of a house seat(1=Republican,0=Democrats), 
+we should interpret the model as a Random Utility Model. The reason being as 
+follows:
+
+Here, the variables that do not vary over the choice alternatives drop
+out of the difference, given our assumed linear function. One individual variable
+x does not directly determine whether or not the House member is a Republican,
+Democrat, or Independent. For a Varying Parameters Model, if we suppose that we 
+focus on the vector of socio-demographic characteristics Zi, the individual’s choice 
+of being Republican would depend on those characteristics alone. Furthermore, 
+we assume that there are other factors, Zi that are individual characteristics 
+that are observed such as age, employment, race, and other demographic information, 
+(urban or rural areas) in the model.
+
+Moreover, we assume that that choice is a discrete event in the model. In other 
+words, choice is all-or-nothing. For our sample, The House member muse be 
+Republican or not Republican. Thus choice is not a continuous dependent variable. 
+Also, we assume that the attraction or utility towards a discrete varibale varies 
+across individuals as a random variable. By using utility, we are being consistent 
+with economic theory. The focus of this assumption lies within “randomness” in the 
+label random utility model.
+
+In conclusion, we see in this model that the individual examines how x’s vary 
+across the state of the world if ‘yes’ versus ‘no’ for Republicans.
+
+
+**Load data form website**
+
+	webuse set "http://rlhick.people.wm.edu/econ407/data"
+
+	webuse congressional_105
+
+b) Estimate binomial logit, probit, and OLS model
+
+**Run OLS and plot predicted errors**
+	
+	reg repub black age65 mdnincm miltpop blucllr urban finance unemplyd enroll nucplant
+	
+	estimates store m1, title (OLS)
+	
+	margins, dydx(black age65 mdnincm miltpop blucllr urban finance unemplyd enroll nucplant) continuous atmeans
+	
+Within our regression we have repub set as our dependent variable and our multiple
+explanatory variables that include age65 (number of people older than 65 years), 
+mdnincm (median family income in district), blucllr (people in district who are 
+employed in blue collar work), miltpop (military population), black (number of
+African Americans in the district), urban (popoulation in urban areas), etc. 
+
+From our regression model we can see that if the coefficients black, miltpop, 
+blucllr, urban, unemplyd, and nucplant have negative signs, indicating it leads 
+to a negative relationship with the hopes of the house member being represented 
+as Republican. We can also observe that these coefficient values are extremely low 
+and that variables black, age65, mdnincm, miltpop, blucllr, and nucplant are not 
+statistically significantly different from 0, with p-values larger than 0.05. 
+Furthermore, we see that nucplant, finance, and unemplyd have the highest coefficient 
+values in the model.
+
+The problems with the OLS involve the predicted value from an OLS regression (dˆ = x(x0x)
+−1x0y = x(x0x)−1x0d not being constrained in the interval [0,1]. In addition, the 
+estimated marginal effect, ∂E(dˆ|x)∂x = b. Also, the errors cannot be normally 
+distributed and the errors are heteroskedastic. OLS estimation of the Linear 
+Probability Model will be inconsistent unless it happens to be the case that 
+0 ≤ xiβ ≤ 1, for every i.
+
+	
+	predict ehat, resid
+	
+	predict yhat
+	
+	graph twoway kdensity yhat
+	
+	scatter ehat yhat
+	
+**Run Probit **
+
+	probit repub black age65 mdnincm miltpop blucllr urban finance unemplyd enroll nucplant
+	estimates store m2, title (Probit)
+	
+	predict probithat
+	
+	graph twoway kdensity probithat
+	
+At each iteration, the log likelihood increases because the goal is to 
+maximize the log likelihood. When the difference between successive 
+iterations is very small, the model is said to have converged and the 
+iterating stops.
+	
+The coefficient of black is 2.84e-06.  This means that an increase in African Americans 
+decreases the predicted probability of Republican.
+	
+	fitstat
+	
+	margins, dydx(black age65 mdnincm miltpop blucllr urban finance unemplyd enroll nucplant) continuous atmeans
+	
+**Run Logit **
+	
+	logit repub black age65 mdnincm miltpop blucllr urban finance unemplyd enroll nucplant
+	
+	estimates store m3, title (Logit)
+	
+	estout m1 m2 m3
+	
+
+After analyzing all three models, we can see some noticeable differences from our
+parameters (coefficients). When observing coefficient signs, we see that the OLS 
+has a positive sign for median family income in district, which increase the probability 
+of a house member being Republican. Furthermore, we have a postive constant, indicating 
+when all explanatory variables are held constant, or in other words, not African American, 
+at the age of 65 or lower, etc, we expect a positive probability that the house member 
+is Republican, whereas the probit and logit models reveals a larger negative coefficient. 
+The logit model also happens to have larger coefficient in comparison to the other models
+
+For all of the models considered thus far, our estimated parameters
+are our marginal effects. Here, since the expected value of di
+is: E(di|xi) = 0 × (1 − Prob(di = 1|xi)) + 1 × Prob(di = 1|xi)
+
+When observing the marginal effects coefficients for OLS, probit and logit, we can 
+see that the OLS model's coefficients does not change after implement marginal effects 
+whereas for the logit model, the coefficents had a drastic increase in coeffients. 
+In logistic regression, as the distance between two points gets smaller and smaller, 
+i.e. as delta gets closer and closer to 0, the slope of the line connecting the points 
+gets closer and closer to the marginal effect. For the probit model we also see a 
+positive change as coefficients increase. The signs for these coefficients, however 
+remain the same. 
+
+
+c). Probability of Republican
+
+**Calculate p**
+
+	mchange
+
+**Calcualte model prediction for p**
+	
+	predict rephat
+	
+	list repub rephat if _n <= 15
+	
+We can see that from our first 5 observed district out of the chosen 15, the Republicans 
+should focus their resources on Districts 3, 5, 7, 11, 12, 13, and 15 as we see that 
+the binary value 1 is associated with values higher than 0.5 for Republicans to be 
+assumed to be true for the house member in the election cycle. In comparison, it would 
+be best to overlook other districts we may have predicted to be Republican but are 
+actually Democrats, such as districts 1, 2, and 4, where our model was weak.
+
+In terms of probability:
+
+For Republicans we see that 7/15 or 46.7% were predicted correctly.
+As for our errors, we see that 3/15 or 20% were predicted as Republicans 
+when instead they were actually Democrats. 
+
+For Democrats we see that 3/15 or 20% were predicted correctly
+As for our errors, we see that 2/15 or 13.3% were predicted as Democrats 
+when instead it was Republican. 
+
+Overall we see that 10/15 for Democrats and Republicans, 10/15 or 66.7% were predicted 
+corectly, while we see that 5/15 or 33.3% were predicted incorrectly.
+	
+	lstat
+
+
+d) For the first district in your data and the probability you calculate above, explain how the
+Probit probability is derived from model errors, the predicted mean of the distribution for
+each individual (xiβ), and the probability distribution of the model.
+
+Graphical analysis was used to answer this question, attached on separate sheet. 
+
+
+e) Using our model, we forecasted that Democrats should focus their resources 
+on districts 6, 8, and 14 for the next election cycle. We found that by observing 
+the rephat values that did not exceed 0.5 for republicans, we denoted as districts 
+that were thought to be Republican, but unfortunatley, was not the case. 
+
+
+f) For McFadden’s, the log likelihood of the intercept model is treated as a total 
+sum of squares, and the log likelihood of the full model is treated as the sum 
+of squared errors (like in approach 1). The ratio of the likelihoods suggests the 
+level of improvement over the intercept model offered by the full model. A 
+likelihood falls between 0 and 1, so the log of a likelihood is less than or equal 
+to zero. If a model has a very low likelihood, then the log of the likelihood will 
+have a larger magnitude than the log of a more likely model. Thus, a small ratio 
+of log likelihoods indicates that the full model is a far better fit than the 
+intercept model. When comparing two models on the same data, McFadden’s is 
+higher for the model with the greater likelihood.
+
+Count R-Squared does not approach goodness of fit in a way comparable to any OLS 
+approach. It transforms the continuous predicted probabilities into a binary 
+variable on the same scale as the outcome variable (0-1) and then assesses the 
+predictions as correct or incorrect. Count R-Square treats any record with a 
+predicted probability of 0.5 or greater as having a predicted outcome of 1 and 
+any record with a predicted probability less than 0.5 as having a predicted 
+outcome of 0. Then, the predicted ones that match actual ones and predicted zeros that 
+match actual zeros are tallied. This is the number of records correctly predicted, 
+given this cutoff point of 0.5. The R-square is this correct count divided by 
+the total count.
+
+The count R square seems good because it is said that it can describe 
+the proportion of correct prediction (i.e. the correct predicted vote/the 
+observed vote). But this measure seems to contradict with others.  
+
+From our given model, it seems that the Logit model has a higher count r-squared
+value of 0.493 in comparison to the Probit model with a count r-squared of 0.488.
+
+The logit model also has a slightly higher McFadden value of 0.251, whereas the 
+probit model as a McFadden's pseudo r-squared value of 0.250. We believe according 
+to this data that the logit model would have a slightly higher likelihood.
+
+
+g) When comparing the probit and logit models, we can observe the AIC 
+(Akaike Information Criterion) count of the r-squared to see how much of our specified 
+data in the model was predicted correctly. The lower AIC indicates a better fit of the model. 
+Hence, we see that the logit model has three tenths lower AIC value of 472.210, whereas the 
+probit model has an AIC value 472.524. We would conclude, that although both models 
+seem to have similar AIC values, the logit model would be a better fit. Moreover, 
+the logit model may be slightly easier to introduce random parameters to and estimate 
+as a simulated maximum likelihood regression.
+
+**Postestimation analysis**
+	
+	fitstat
+	
+**mean predictions**
+
+	mtable, atmeans
+	
+**Marginal effects**
+
+	margins, dydx(black age65 mdnincm miltpop blucllr urban finance unemplyd enroll nucplant) continuous atmeans
+
+
+**Estimate the margins command: manually calcualte elasticity**
+	gen black_orig = black
+	
+	predict phat
+	
+	predict residuals, r
+	
+
+h) **This shows how to predict the values when we change an x value (increase African Americans' population by 20%)**
+
+	
+Based on this data, we want to predict the number of districts who would be
+‘Republican’ in this Congress if the share of African Americans (as a fraction of total
+population) living in the district increased by 20% in every district. 
+
+
+	replace black = black*1.20
+	
+	predict phat1
+	
+	gen pchange = 100*(phat1-phat)/phat
+	
+	sum pchange phat phat1 if _n<= 15
+
+**Compare to stata margins**
+
+	margins, dydx(black age65 mdnincm miltpop blucllr urban finance unemplyd enroll nucplant) continuous
+	
+	replace black = black_orig
+	
+	lstat
+	
+Through the lstat command, we can clearly see the probabilities of Type 1 and Type 2 
+errors where predictions have beend made for Republicans and Democrats for the model. 
+	
+If the popoulation of African Americans increases by 20 percent in each district,
+then according to our model, the predicted probabilites will decrease by 5.490356.
+
+Hence, 42 districts predicted to be Republican were actually Democrats.
+
+
+i) The inverse of the information matrix of the likelihood function is the estimated 
+variance/covariance of the matrix for the paramters with standard errors for those paramters. 
+Information is matrix is the negative of expected value of hessian matrix) of 
+second derivative of likelihood with respect to parameters. The SE is the square 
+root of the diagonal of the information matrix (Fisher).

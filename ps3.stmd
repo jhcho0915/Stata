@@ -1,0 +1,347 @@
+% Problem Set 3
+% October 22, 2018
+% Jae H. Cho
+
+Description: The data is from James Heakins, a former undergraduate student 
+of Professor Wooldridge at Michigan State University, for a term project. 
+They come from Botswana’s 1988 Demographic and Health Survey.
+
+
+**Import data from online source**
+	webuse set http://rlhick.people.wm.edu/econ407/data
+	
+	webuse fertility 
+	
+**Summary**	
+	sum
+
+	hist agefm
+	graph export agefm.png, replace
+
+**Histograms**
+
+![Histogram of Age First Married](agefm.png){width=60%}
+
+	hist educ
+	graph export educ.png, replace
+	
+![Histogram of education](educ.png){width=60%}
+	
+	hist agefbrth
+	graph export agefbrth.png, replace
+	
+![Histogram of Age of Woman's First Birth](agefbrth.png){width=60%}
+
+
+	
+*Regression Equation*
+	regress agefbrth educ ceb usemeth agefm urban educ0
+	
+	margins, dyex(educ) continuous
+
+**2**
+
+a)
+**Regression Analysis**
+
+In the regression equation above, I first chose the variables that were 
+normalized data sets, when statistically analyzing with histograms. These variables 
+consisted of mnthborn, idlnchld, agefm, age, and educ. However, I further
+narrowed down my chosen variables from those normalized histograms, after realizing 
+that the month the female was born had in no way any effect or relevance on the age 
+of the female at first birth. Ideal number of children also followed this explanation. 
+For the variable age, we did not want any correlation amongst the x terms, believing
+that age and agefm could be in some way related. There were no helpful changes that 
+could be made to normalize the histograms of other variables through logarithmic, 
+square term, cube root, square root, or inverse transformations. Therefore, under 
+the normality assumption for the independent variables, I kept agefm, since the age 
+of the woman when she first married can be relevant towards the women's age at first 
+birth of a child.
+ 
+It is also to our understanding to account for other variables that may influence
+the age of females after their first birth, through binary (dummy) variables
+in our model, keeping in mind we must have k-1, where k represents number of 
+parameters/variables in the regression model. Hence, I included usemeth, urban,
+and educ0. The variable usemeth would help to explain a woman's knowledge, whether 
+or not she knew about birth control or had any experience, which was our only variable close enough to
+measure sexual activities that may have led to unintentional or intnentional births,
+especially for women who gave birth at an early age. 
+
+The explanatory variable ceb was used to account for any information on other children 
+born from the woman. This was why I had excluded children and idlnchld throughout
+the model, since this dummy variable already accounted for this category 
+in my regression model. Furthermore, the variable ceb was influential because in
+most cases, a woman with many children would have most likely to have given
+birth at an earlier age.
+
+Based on the exogeneity assumption inherent in this model, I wanted the variables 
+to be independent from one another and not directly affected or influenced
+within the system/regression itself. Therefore, we want to make sure our exogenous
+variables are outside factors only. In my regression equation, I used agefm(age at first
+marriage) because it is not directly or internally relative to the outcome of
+the other variables listed in the regression model. For example, the age a female
+first get married does not determine/is determined by the area where she lives,
+the number of living children, and whether they have ever used birth control or not. 
+Despite the implications where more women in rural areas may tend to marry at an 
+earlier age, or that educated women tend to marry later, it is not a clear or 
+direct effect on the variables and their causal relationships with agefbrth. 
+ 
+b) 
+**Endogeneity**
+
+In my point of view, I hypothesize, given the results from part (a), that the 
+variable education (educ/xK) might be endogenous. For starters, education is
+affected in some way by each of our explanatory variabels and vice versa included in the model.
+One could say that those who live in an urban environment most typically have a
+higher education, due to larger population where people are competittive in studies
+and jobs, and are challeneged to succeed and continue devloping their lifestyle
+and education. 
+
+We can also say there may be better schools, richer families who
+can provide personal tutoring at home, better facilities to promote education
+and more educated people who are taking good jobs in urban areas. Education is also relevant
+to the age a woman was first married. Typically, a woman who is educated would
+most likely marry at a later age, wishing to pursue her dream job or make more
+money and stabilize her living environment as well as personal lifestyle before
+making changes for a new addition to the family with responsibilities to be held.
+
+If women are highly educated, they are most likely to know the effects of birth control,
+so it is safe to suggest that a woman who is educated would most liekly be using
+birth pills when pursuing sexual activities to avoid potential accidents for a newborn
+child for which they would not expect at an early age. We imply they must have at
+least some point taken a health class, or interact with other educated people
+and often would tend to avoid the mistakes from others that they may have observed.
+
+c) 
+**IV Regression**
+
+Considering an IV regression approach to the endogeneity problem where I used one
+instrumental variable for xK (yearborn), I tested for the relevancy of the instrumental 
+variable and concluded this instrument as a relevant piece to the model. 
+
+	ivregress 2sls agefbrth ceb usemeth agefm urban educ0 (educ = yearborn)
+	
+	margins, dyex(educ) continuous
+	
+	estat firststage
+
+
+	regress educ ceb usemeth agefm urban educ0 yearborn
+	
+	test yearborn
+	
+	predict rhat, resid
+	
+	hist rhat
+	
+	regress agefbrth educ ceb usemeth agefm urban educ0 rhat
+	
+	test rhat = 0
+	
+When comparing the independent variables for the instrumental variables regression 
+and the OLS regression, we see a difference in both signs and values of the coefficients.
+The coefficients are much larger in the instrumental variable equation, when
+we set yearborn as our onlu instrument. We can also see that the variable ceb 
+(children still living) became a positive coefficent in the instrumental variable.
+All the other vriables for agefm, urban, educ0 simply increased in value, and finally
+the constant also chaned signs to a negative value, indicating that in the instrument 
+equation, for an uneducated female without any children, no use of birth control, 
+single, not living in an urban area, would have a negative result for the age at 
+first birth, which seems reasonable. 
+
+Furthermore, we see that when we observe the education variabels coefficient when 
+implementing the margins command dyex (educ) continuous, that the dy/ex value
+increases from 1.24 to 23.5. The p-vlaue also remains low, less than 0.05.
+
+d) 
+**Instrumental Variable**
+
+The first assumption excludes the instrument z, or in our case yearborn from being a 
+regressor in the model for y. If y was dependent on both x and z, and y was regressed on x
+by itself, then z is being used in the error, so that z will be correlated with
+the error. 
+
+The second assumption requires that there is some association between
+the instrument and the variable being instrumented. I can be said that education is
+relevant to the year the woman was born. Typically people from different generations
+have different ways of learning, and there are possibilities that trends for raising
+children or the advances of media or technology may have sparked an influence in
+lifestyles of some people and familes for that particular year. 
+
+My chosen instrument yearborn meets the requirements for a good instrumental 
+variable given the relationships it shares with the other explanatory variables. 
+Similar to yearborn and education, when we observe the exogenous variables, the year the woman 
+is born can be relevant to how many children she has. 
+
+It is reasonable to conlcude that a woman carries personal beliefs during that geenration
+or maybe feels that she would like children to be born a certain year. In terms of urban 
+environment, there may have been an economic crisis, storm, or something that may have 
+led the woman to give birth at a certain age, where there are most often economic 
+challenges that arise in urba areas. For the variable agefm, the year at which the 
+woman was born, may very well affect the age at which she was married. 
+
+e)
+**Mata Output**
+
+Using mata, I replicated the parameters and standard errors of this model based on
+findings in Question 1 (a) and (c).
+	
+*From 1 Instrument IV Regression*
+	
+	ivregress 2sls agefbrth ceb usemeth agefm urban educ0 (educ = yearborn)
+	
+	gen ones = 1
+	
+	drop if mi(agefbrth)
+	
+	drop if mi(ceb) 
+	
+	drop if mi(educ)
+	
+	drop if mi(usemeth) 
+	
+	drop if mi(educ0) 
+	
+	drop if mi(agefm) 
+	
+	drop if mi(yearborn)
+	
+	drop if mi(urban) 
+	
+	mata
+	
+	y = st_data(., "agefbrth")
+	
+	z = st_data(., "ceb usemeth agefm urban educ0 yearborn ones")
+
+	x = st_data(., "ceb usemeth agefm urban educ0 educ ones")
+
+**Formulas for the biv paramters and standard errors**
+	
+	biv = luinv(z'x)*z'y
+	
+	biv
+	
+	N = rows(z)
+	
+	K = cols(z)
+	
+	N
+	
+	K
+
+	e = y - x*biv
+	
+	SSE = (e'e)/(N-K)
+	
+	v = z*invsym(z'z)*z'
+	
+	xhat = x'v*x
+	
+	se = sqrt(diagonal(SSE*invsym(xhat)))
+	se
+
+	end
+
+f) 
+**Conduct a test for the endogeneity xK**
+
+The basic test we consider here starts with the observation that if there is endogeneity then 
+b[ols] is biased. If we have tested for and identified a useful instrument(s), and 
+estimated an IV model, then we have the following hypothesis to test
+
+	ivregress 2sls agefbrth ceb usemeth agefm urban educ0 (educ = yearborn)
+	
+	estat endogenous
+	
+	estat firststage
+
+The null hypothesis is that the instrument (yearborn) set is valid and the model is correctly
+specified. Therefore, we fail to reject the null hypothesis and define our instrument
+as a valid indicator to use for our model. This is reasonable as we have stated the logical,
+economic and general ways the instrument is related, and thorugh the instrumentable 
+variable test procedure, this reveals to show that yearbon is a suitable instrument.
+
+g) 
+**Instrumenting for education (xK) using more than one instrumental variable**
+
+We would like to be able to test our assumptions to ensure that our candidate 
+instrumental variable (yearborn) meets these conditions. If it does not conform 
+with these assumptions, our β's will be biased. We will now be using the General
+Method of moments IV regression, where we test for 2 instrumental variables. The
+second instrument we added to test is children. We would hope that the number of
+children living (ceb) would impact the variable children in some relevant way
+which is a plausible reason to choose this as a hypothetical instrument.
+
+	ivregress gmm agefbrth ceb usemeth agefm urban educ0 (educ= yearborn children)
+
+	margins, dyex(educ) continuous
+
+h) 
+**Test the endogeneity of xK**
+	
+	estat endogenous
+	
+	estat firststage
+	
+In this new model, with a low p-value, we reject the null hypothesis and conclude
+that education is clearly an endogenous variable for our gmm ivregression. Therefore,
+we can now compare in our analysis to see how educaiton plays its role as an endogenous
+variable in the regression.  
+
+i) 
+**Test for overidentification**
+	
+The intuition the overidentificattion test is dependent on the information 
+within the error from the 2sls regression. If the errors can be explained well 
+using information in our IV's, then they are not good instruments, since we need 
+them to be uncorrelated with the error. The Sargan approach jointly tests 
+whether overidentification poses a problem. If it is problematic, we attempt 
+using a subset of IV's or look for new ones.
+
+	estat overid
+
+We find that as a result of our overidentificaion test, the joint/multiple 
+Instrumental Variable model is strong and relevant (yearborn and children)
+and not overidentified.
+
+
+j) 
+**Rationale for using more than 1 instrument for education**
+
+We maintain the assumption that E(z'h($\epsilon$)) = 0, where z and zh are of dimensions
+N*K + M and N*1.
+
+We consider the condition (E(z'($\epsilon$) = 0) and the implication for our IV 
+estimator z'e^(iv) = 0.
+
+z is the dimension Z x(K + (M - 1)), whereas e^iv is (N x 1). The product is of dimension
+(K + M - 1) * 1. But with only K parameters to estimate, we have more equations
+than the unkonwns. Therefore we tested for relevance, strength, and overidentification
+in IV regression. 
+
+The intuition of this test is dependent on the information contained in the 
+error from 2sls regression. If these errors can be explained using information 
+in our IV's, then they really aren't good instruments, since we need them to be 
+uncorrelated with the error. From my case, it was found that yearborn and children
+were relevant and strong instruments as they did pass the overidentification test.
+We still want to acknowledge that there may be concerns regarding the exclusion
+restriction as well as endogeneity as a problem.
+
+k) 
+**GMM and 2sls**
+
+In general, using 2SLS with appropriately robust inference is sufficient, 
+and is less of a black box (what goes on within the the mind is ignored, 
+in favor of discovering which inputs produce the desired output). 
+GMM is oftne used when you are trying to gain efficiency due to neglected serial 
+correlation and/or heteroskedasticity. It can also be used with multiple equations 
+to efficiency use information across equations.
+
+In terms of the ivregress gmm model, the use of Two-Stage Least Squares over 
+Generalized Method of Moments, we can see some changes in comparison. We see that
+the variable educ still remains as an endogenous variable for the two instruments
+from the regression. The dy/ex value for education is valued at 21.514 which is
+lower than the 2sls regression for educ as endogenous variable when only testing
+one instrument yearborn. Overall, 2sls regression can be computed in two-stages
+but cannot generalize to nonlinear models.
