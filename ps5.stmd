@@ -1,0 +1,439 @@
+% Problem Set 5
+% Jae H. Cho
+% December 4, 2018
+
+** Question 1**
+
+1c) 
+** Calculate the inverse mills, ratio and the quantities you discuss in the 
+** previous two parts of this question.**
+
+The value -1 was placed in cell var1 to be use for calculation.
+Then the following commands were implemented to calculate the inverse mill ratio
+and the given quantities.
+	
+	gen z = -1
+	
+	set obs 1
+	
+	replace z = -1 in 1
+	
+	gen pdf = normalden(8,10,2)
+	
+	gen cdf = normal(z)
+
+	gen inv_mill = pdf/(1-cdf)
+
+	di pdf
+
+	di cdf
+
+**Inverse Mills Ratio**
+
+	di inv_mill
+
+**E(yi-y|yi-y>a)**
+
+	gen exp_y = 10 + 2*inv_mill
+
+	di exp_y
+
+	gen exp_yi = cdf*8 + (1-cdf)*(exp_y)
+
+**E(yi)**
+
+	di exp_yi
+
+	sysuse auto, clear 
+
+
+** Question 2**
+
+Consider the data from a recent study by Deb, Munkin and Trivedi (2006) on health 
+expen- ditures. The methods they used in the paper are near the cutting edge of 
+econometrics research, and are way beyond the scope of the course; however, it is 
+worthwhile noting the difficulty involved with extending a sample selection 
+model for endogeneity. 
+
+2a)
+	webuse set http://rlhick.people.wm.edu/econ407/data
+	
+	webuse deb_munkin_trivedi
+
+	regress lambexp ins totchr age female 
+
+It appears that after looking at the histograms, we can see that lambexp appears 
+to look more normal distribution visually in comparison to the histogram of the 
+ambext histogram. Hence, we will use this as our dependent variable.
+	
+After observing our OLS model estimate we can make the following interpretations.
+
+R-Squared is the "proportion of variance" in the dependent variable (ambexp), 
+ambulatory expenditure, which can be explained by the independent variables 
+(ins, totch, age, and female). This is an overall measure of the strength of 
+association and does not reflect the extent to which any particular independent 
+variable is associated with the dependent variable. In this case we have 18.34% 
+variations in ambulatory expenditure can be explained by insuance, total chornic disease, 
+age, and gender(female).
+
+ins – The coefficient is -0.0076582. Because this is a dummy variable, if a person 
+is enrolled in health insurance (PPO or HMO), a 0.0076582 unit decrease in ambulatory 
+medical expenditures (excluding dental and outpaitent mental) is predicted, holding 
+all other variables constant. 
+
+totchr – For every unit increase in number of chronic disease, we expect a 0.5624172 unit 
+increase in ambulatory medical expenditures (excluding dental and outpaitent mental) 
+is predicted, holding all other variables constant.  
+
+age – The coefficient for age is 0.2268115. So for every unit increase in age 
+(age in years /10), we expect an approximately 0.2268115 point increase unit 
+in ambulatory medical expenditures (excluding dental and outpaitent mental) 
+is predicted, holding all other variables constant.  
+
+female – The coefficient for female is 0.3685775. So if female, we expect a 0.3685775
+point increase in ambulatory medical expenditures (excluding dental and outpaitent mental) 
+is predicted, holding all other variables constant.  
+
+m. Std. Err. – These are the standard errors associated with the coefficients.
+
+https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faqhow-do-i-interpret-a-regression-model-when-some-variables-are-log-transformed/
+
+The variable ins was included in the model, taking into account that a person who 
+is insured is most likely to spend less on ambulatory medical expenditure. Ambulatory 
+health care clinics and facilities are generally offered to people who are uninusred
+or outpatients. Hence, a person who is insured with healthcare of some sort would least 
+likely spend their money on these types of expenditures and avoid these services.
+
+Total chronic disease was used as a relative factor which may cause ambulatory expenditure 
+to increase, as people begin to find special forms of treatment or frequent visits 
+to make sure their status is healthy and are fully aware and prepared for other 
+outcomes pertaining to their conditions through medicla recommendations, therefore 
+influencing amulatory medical expendture to rise.
+
+Age and gender were primarily used a possible factors that have no direct relevance to 
+the other independent variables. It is interesting to question the idea of an older person 
+to typically to visit the hospital and may increase expenditure on ambulatory expenditure, 
+regardless of whether or not they are insured. In terms of gender, females are more 
+likely to visit the hospital and receive diagnosis and treatment, often noting that 
+they are more likely to pay careful attention to their personal health. 
+
+ 
+**Histograms**
+
+	hist lambexp
+	graph export lambexp.png, replace
+	
+![Histogram of Lambexp](lambexp.png){width=60%}
+	
+	hist ambexp
+	graph export ambexp.png, replace
+	
+![Histogram of Ambexp](ambexp.png){width=60%}
+	
+It appears that after looking at the histograms, we can see that lambexp appears 
+to look more normal distribution visually in comparison to the histogram of the 
+ambext histogram. 
+
+In terms of downsides to using log transformations, there are things to take into consideration.
+If the original data follows a log-normal distribution or approximately so, then the 
+log-transformed data follows a normal or near normal distribution. In general, 
+the log-transformation does remove or reduce skewness. Unfortunately, recent studies 
+reveal that data do not approximate the log-normal distribution so applying this 
+transformation does not reduce the skewness of the distribution. 
+ 
+For most right-skewed data, the log-transformation may make it either right or 
+left-skewed. If the original data does follow a log-normal distribution, the 
+log-transformed data will follow or approximately follow the normal distribution. 
+However, in general there is no guarantee that the log-transformation will reduce 
+skewness and make the data a better approximation of the normal distribution.
+
+
+2b)
+The Heckman Model
+	
+	heckman lambexp ins totchr age, select(dambexp = blhisp educ ins female)
+	
+After plotting the histogram of our dependent variable for lambexp, we found that 
+it was normally distributed with no obvious outliers. Due to our intuition of normality 
+we use lambexp for our particular model, requiring no further transformations. 
+
+My reasons for implementing these specific independent variables in the model are very 
+much similar to that explained in the OLS model. One who is insured is most likely 
+to have a lower expenditure when it comes to ambulatory medicla expenses, due to the fact
+that many are solely used for the purpose of those patients uninsured or that simply 
+come into the hospital for treatment regardless of association to medical expenses. In 
+terms of totchr and age, disease can in some way implement one to go to the hospital 
+frequently as diseases may be taken seriously and people may want diagnosis and track 
+their health over the course of a period of time. 
+
+For age, we mostly likely wish to believe that older poeple tend to pay specific attention 
+and detail to their health and wish to go through tests and diagnosis of whether or not they 
+are in good conidition. Nowadays, people have a longer lifespan due to advanced medicine 
+and technology, hence, an argument to counteract this would be that those who wish to 
+access these resources may obtain medical insurance at the price of increasing expenditure 
+on ambulatory medical expense.
+
+There are also cases to note when people may not wish to visit the hospital. People 
+may have know practiced physicians who are able to diagnose themselves or others 
+they may know. Others may be poor poeple who do not have high income or monetary needs 
+to access the health resources they require to get better. We must also take poverty 
+into account as well as possibly those who live far away from a nearby hospital. Most 
+hospitals do not take in patients who don't have clothes, insurance depending on their 
+credit history, etc.
+
+I chose blhisp, educ, ins, and female as my z variables accounting for the idea that 
+they are responisble for the explanation of censoring in the model. The variables are 
+by no means in correlation with the errors/unincluded terms, and are helpful in determining 
+the effect of our dependent variable (lambexp). If a person is more educated, he or she 
+is most likely to find ways to optimize their options to limit medical expenditure 
+while taking opportunities to spend more if they are insured to find a better cure 
+or treatment. Our w variable is not in our original model (dambexp) and measures 
+solely depneding on the variable ambexp, on wehther a person has positive ambulatory 
+medical expenditure. Because it is simply dependent on y it cannot be included in the 
+model as an independent variable which is why dambexp is suitable as a w variable.
+
+We want an identifiable model, depending on choosing w not in x that have 
+a behavioral reason for not being in x and focus on why w would be included in x’s
+
+2c)
+As re-stated in part b, the basic idea of a sample selection model is that the 
+outcome variable, in our case medical expenditures, is only observed if some criterion, 
+defined with respect to variables z, in our case, number of chronic illnesses, age, 
+and race(whether a person is black/hispanic), is met accordingly. 
+
+The general form of the model comes in two stages. In the first stage, a 
+"dichotomous variable" z determines whether or not lambexp(y) is observed, 
+lambexp being observed only if z=1 in the second state, we model the expected value 
+of lambexp, conditional on it being observed. 
+
+So, we observe z (a dummy variable, which is a realization of an unobserved/latent 
+continuous variable z*) having a normally distributed, independent error, e, with 
+mean 0 and a constant variance sigma squared e. 
+
+For values of z = 1, we observe lambexp and model that with 
+some independent variables X and get a vector of coefficients beta, y*, which 
+has a normally distributed, independent error, u, with a mean zero and a constant 
+variance sigma squared U. The two errors are assumed to have a correlation rho. 
+The joint distribution of u and e is bivariate normal.
+
+Our dependent vaiable y is lambexp, the log of the ambulatory expenditures given 
+that a person has abulatory expenditures (ambexp > 0). THe w variable (dambexp) is a binary variable 
+that is dependent upon the outcome ambexp and can simply overlap with the independent 
+variables (ins, totchr, and age), but we need one w (or some) to not explain 
+expenditures which is our dependent variable in this case.
+ 
+What also have to take into account the situation where it matters for a person 
+who is already there in hospital with pain. For this, insruance would play a significant role, 
+where people who are medically insured would eexplain the reason for them being there 
+longer not directly affecting other independent variables in the model.
+
+In terms of economic rationale, for the two-step process in medical expenditures, 
+one would say the more one spends, it overall does not provide a postive feedback 
+to the entirety of the global business. People nowadays are more likely to be 
+insured, which will in return cause health expenditures to rise. 
+
+Ambulatory health expenditure will also rise for an exopnential demand in medical 
+care concerning diagnosis, observation, consultation, treatment, intervention, etc. 
+Through advances in health and medicine, we may see a global trend in longer lifespans, 
+mortality rates will decrease and the population will lean towards older people who 
+will tend to visit hospitals more than younger people. 
+
+
+2e)
+Examinig expected value of their expenditures (for unit increase in x1, 
+positive in military expenditure increases)
+
+E[y|y obs] = We are examining the expected value of their expenditures, 
+conditional on them having positive expenditures for that year.
+
+	predict ycond, ycond
+	margins, predict(ycond) eyex(ins age totchr educ female blhisp)
+
+Elasticity
+ins - A one unit increase in the person enrolled in health insurance is associated 
+with a 0.27398% decrease in ambulatory expenditures given that it 
+is positive.
+
+totchr - A one unit increase in the number of chronic disease is associated 
+with a 3.72919%. decrease in ambulatory expenditures given that it 
+is positive. 
+
+age - A one unit increase in the person's age (years/10) is associated with the selected 
+ambulatory expenditures given that it is positive by increease of 13.67921%.
+
+blhisp - For an African American, the selected ambulatory expenditures given that 
+it is positive is assoicated with a decrease of 1.03162%. (1.03162% higher than hispanics)
+
+educ - A one unit increase in the person's years of schooling, is associated with the selected 
+ambulatory expenditures given that it is positive with increase of 4.14373%.
+
+female - For a female, the selected ambulatory expenditures given that it is 
+positive increases by 13.6656%.
+	
+
+Prob(Y Obs) = We are examining the probability someone has positive expenditures 
+for that year.
+
+	predict probobs, psel
+	margins, predict(psel) eyex(ins age totchr educ female blhisp)
+
+Elasticity
+ins - For one unit increase in a person enrolled in health insurance, the probability of 
+that person having positive ambulatory expenditure increases by 1.3042%.
+
+blhisp - For a person who is African american, the probability of 
+that person having positive ambulatory expenditure decreases by 5.7192%. That much 
+higher than a hispanic. 
+
+female - For a person who is female, the probability of that person having 
+positive ambulatory expenditure increases by 5.75839%.
+	
+	
+E[y] = We are examining the expected value of their expenditures recognizing 
+that some will not have any expenditures. This takes censoring into account
+	
+	predict y, yexpected
+	margins, predict(yexpected) eyex(ins age totchr educ female blhisp)
+
+Elasticity
+ins - A one unit increase in the person enrolled in health insurance is associated with the selected 
+ambulatory expenditures increase of 5.3022%.
+
+A one unit increase in chronic disease is associated with the selected ambulatory expenditures 
+increase by 3.72919%.
+
+A one unit increase in a person's age is associated with the selected ambulatory expenditures 
+increase by 13.67921%.
+
+For a person who is African American, the selected ambulatory expenditures 
+decrease by 6.75082%, in comparison to hispanic. 
+ 
+A one unit increase in a person's year of schooling is associated with the selected ambulatory expenditures 
+increase by 24.35804%.
+ 
+For a person who is female, the selected ambulatory expenditures is associated with an
+increase by 7.12492%.
+	
+	
+E[y*] = We are examining the expected values of our whole population. For this 
+case, censoring is not taken into account.
+	
+	predict xb
+	margins, predict(xb) eyex(ins age totchr educ female blhisp)
+	
+Elasticity
+The expected value of expenditures for the total sample, without censoring.
+
+A one unit increase in the person enrolled in health insurance assoicates with the 
+ambulatory expenditures in the sample decrease by 0.52516%.
+
+A one unit increase in chronic disease associates with the ambulatory expenditures in the 
+sample increase by 3.59269%.
+
+A one unit increase in the person's age, the ambulatory expenditures in the 
+sample increases by 13.07141%.
+
+
+2f)
+**Manual Calculation of Log Likelihood Function at the model estimates**
+
+	heckman lambexp ins totchr age, select(dambexp = blhisp educ ins female)
+
+	gen z = 1
+	
+	replace z = 0 if lambexp == .
+	
+	gen sigma = e(sigma)
+	
+	gen rho = e(rho)
+	
+	predict wg, xbsel
+	
+	predict xb1, xb
+	
+	gen probnotcensored = normal(wg)
+	
+**Formulas**
+
+	gen arg = (wg + rho *((lambexp - xb1) / sigma))/((1-(rho^2))^(1/2))
+	
+	gen cont_select = ln(normal(arg)) - 1/2*((lambexp-xb1)/sigma)^2 - ln(sigma*sqrt(2* _pi))
+	replace cont_select = 0 if z == 0
+	
+	gen cont_not_select = ln(1 - normal(wg))
+	replace cont_not_select = 0 if z == 1
+
+	gen log_likely_hood = cont_select + cont_not_select
+	
+	di log_likely_hood
+	
+	sum
+	
+	di log_likely_hood *_n
+	
+	sum log_likely_hood
+	
+	di r(mean) *_N	
+ 
+	
+2g) 
+**Tobit, Heckman, and OLS**
+
+The Truncated Regression estimates the model over the observed when yi* > a. In terms 
+of pitfalls, the truncated regression is one of the most nonlinear to estimate 
+and copmute; Restrict truncation correction and xb to be same.
+
+In Tobit Censoring, we estimate over the full distribution of yi* but where some 
+yi* < a are coded as a. The pitfalls are very much the same with the truncated 
+regression. The Tobit model assumes normality and the variable yi* is only 
+partially observed. Here the observability of the outcome depends on the values of the
+outcome itself, whether it crosses a non-stochastic threshold.
+
+For the Heckman model, the endogenous sample selection mechanism, full sample for 
+selection LFP = 1 data for continuous. For pitfalls, w and x have to be sufficienlty 
+different but gammas and betas for the selection and the continuous. Here the observability 
+of the outcome is dependent on the values of a binary indicator, which is modelled 
+using a probit regression. The conditional on the values of the binary indicator 
+the second stage is a simple linear regression fitted by OLS - where the conditionality is
+taken into account using the Mills ratio.
+
+There is also the possibility of fitting the whole model all at once
+implementing partial maximum likelihood, but the key intuition is that the
+conditional model for the outcome is a linear regression, and in the
+two-step version of Heckman's estimator, the outcome is fitted using the
+OLS model. It is important to take into account that OLS is an estimation 
+technique and tobit is a model.
+
+
+2h)
+*Analysis between Heckamn adn FIML*
+Shawn Bushway, Brian D. Johnson, and Lee Ann Slocum (co-authors and researchers) 
+published an article studying Heckman Two-Step correction for selection bias in 
+criminology. The researchers stated that the most common approach to estimate an 
+incidental selection models involves a class of estimators known generically as 
+bivariate normal selection models.
+
+The key componenet of these models is that the error terms in the two equations 
+are distributed bivariate normal. When the dependent variable of interest is continuous, 
+there are two basic choices of estimators—a maximum likelihood model often called
+the Full Information Maximum Likelihood (FIML) and the Heckman two-step
+estimator.
+
+The FIML is a general straightforward maximum likelihood model, very much like a probit
+or logit, that maximizes a specified likelihood function. By definition, when the error
+assumptions are met the FIML will always be more efficient than the Heckman twostep,
+a fact which has been demonstrated in numerous simulation studies.
+
+However, the FIML relies more heavily on the normality assumption and is hence,
+less robust than the Heckman two-step to deviance from that assumption. The FIML 
+may have difficulty converging, particularly in the absence of exclusion restrictions, 
+while the Heckman two-step model can almost always be estimated. Hence, the robustness of the Heckman can be a mixed blessing, since it may provide 
+a false sense of security.
+
+Moreover, the Heckman Two Step limited information ML estimator relies only 
+on univariate normality of the marginal distribution, so it is expected to be more 
+robust since that is a lower hurdle to clear. But if you do have joint normality, 
+the Two Step is still consistent, but no longer efficient. However, if you only 
+have univariate normality, then the Two Step remains consistent while the Full 
+Information Maximum Likelihood approaches are not.
+	
